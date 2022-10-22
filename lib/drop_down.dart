@@ -14,6 +14,7 @@ class AnimatedDropDown extends StatefulWidget {
       this.width,
       required this.items,
       this.initialItem,
+      this.onTileTap,
       this.trailingText})
       : super(key: key);
 
@@ -25,6 +26,7 @@ class AnimatedDropDown extends StatefulWidget {
   final double? height;
   final List<AnimatedDropDownItems> items;
   final AnimatedDropDownItems? initialItem;
+  final void Function(int index)? onTileTap;
 
   @override
   State<AnimatedDropDown> createState() => _AnimatedDropDownState();
@@ -43,9 +45,11 @@ class _AnimatedDropDownState extends State<AnimatedDropDown>
   late Animation<double> _arrowAnim;
   late Animation<double> _fadeAnim;
   late ValueNotifier<AnimatedDropDownItems> _currentItem;
+  AnimatedDropDownItems? _initialItem;
 
   @override
   void initState() {
+    _initialItem = widget.initialItem;
     dropDownKey = LabeledGlobalKey("dropDown");
     _currentItem = ValueNotifier(widget.items[0]);
     _animationController = AnimationController(
@@ -86,15 +90,15 @@ class _AnimatedDropDownState extends State<AnimatedDropDown>
               borderRadius: BorderRadius.circular(widget.borderRadius ?? 0),
               boxShadow: const [
                 BoxShadow(
-                    color: Colors.grey, offset: Offset(0, 2), blurRadius: 10),
+                    color: Colors.grey, offset: Offset(0, 2), blurRadius: 5),
               ],
               color: widget.tileColor ?? Colors.white),
           child: ValueListenableBuilder<AnimatedDropDownItems>(
             valueListenable: _currentItem,
             builder: (context, value, child) => Row(
               children: [
-                if (widget.initialItem != null) widget.initialItem!.leading,
-                if (widget.initialItem == null) value.leading,
+                if (_initialItem != null) _initialItem!.leading,
+                if (_initialItem == null) value.leading,
                 const SizedBox(
                   width: 20,
                 ),
@@ -102,12 +106,20 @@ class _AnimatedDropDownState extends State<AnimatedDropDown>
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(widget.initialItem != null
-                        ? widget.initialItem!.title
-                        : value.title),
-                    Text(widget.initialItem != null
-                        ? widget.initialItem!.subTitle ?? ''
-                        : value.subTitle ?? "")
+                    Text(
+                      _initialItem != null ? _initialItem!.title : value.title,
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    if (_initialItem != null && _initialItem?.subTitle != null)
+                      Text(
+                        _initialItem!.subTitle!,
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    if (_initialItem == null && value.subTitle != null)
+                      Text(
+                        value.subTitle!,
+                        style: const TextStyle(fontSize: 12),
+                      )
                   ],
                 ),
                 const Spacer(),
@@ -122,8 +134,7 @@ class _AnimatedDropDownState extends State<AnimatedDropDown>
                         child: child,
                       ),
                       child: const Icon(
-                        Icons.arrow_drop_down_rounded,
-                        size: 42,
+                        Icons.keyboard_arrow_down_sharp,
                       ),
                     )
                   ],
@@ -220,12 +231,18 @@ class _AnimatedDropDownState extends State<AnimatedDropDown>
                                 title: element.title,
                                 subTitle: element.subTitle,
                                 leading: element.leading,
-                                isSelected: element.title == value.title,
+                                isSelected:
+                                    element.title == _initialItem?.title,
                                 onTap: (item) {
+                                  _initialItem = item;
                                   _currentItem.value = item;
                                   _secondaryAnimController.reverse().then((_) {
                                     _animationController.reverse().then((_) {
                                       _overlayEntry?.remove();
+                                      if (widget.onTileTap != null) {
+                                        widget.onTileTap!(
+                                            widget.items.indexOf(element));
+                                      }
                                     });
                                   });
                                   _isExpanded = !_isExpanded;

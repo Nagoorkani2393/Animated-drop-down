@@ -39,16 +39,25 @@ class AnimatedDropDownItemWidget extends StatelessWidget {
           children: <Widget>[
             leading,
             const SizedBox(width: 20),
-            Text(title),
+            Text(title, style: const TextStyle(fontSize: 16)),
             const Spacer(),
-            Text(subTitle ?? ''),
+            if (subTitle != null)
+              Text(
+                subTitle!,
+                style: const TextStyle(fontSize: 12),
+              ),
             const Spacer(),
             isSelected
                 ? const Icon(
                     Icons.check_circle_rounded,
-                    color: Colors.green,
+                    color: Color(0xFF00C868),
+                    size: 20,
                   )
-                : const Icon(Icons.radio_button_unchecked_outlined)
+                : const Icon(
+                    Icons.radio_button_unchecked_outlined,
+                    color: Colors.grey,
+                    size: 20,
+                  )
           ],
         ),
       ),

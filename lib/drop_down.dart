@@ -88,9 +88,11 @@ class _AnimatedDropDownState extends State<AnimatedDropDown>
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(widget.borderRadius ?? 0),
-              boxShadow: const [
+              boxShadow: [
                 BoxShadow(
-                    color: Colors.grey, offset: Offset(0, 2), blurRadius: 5),
+                    color: Colors.grey.withOpacity(0.3),
+                    offset: const Offset(0, 0),
+                    blurRadius: 5),
               ],
               color: widget.tileColor ?? Colors.white),
           child: ValueListenableBuilder<AnimatedDropDownItems>(
@@ -211,11 +213,17 @@ class _AnimatedDropDownState extends State<AnimatedDropDown>
             },
             child: Material(
               color: Colors.transparent,
-              elevation: 5,
+              elevation: 0,
               borderRadius: BorderRadius.circular(widget.borderRadius ?? 0.0),
               child: Container(
                 decoration: BoxDecoration(
                     color: widget.expandedTileColor ?? Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.grey.withOpacity(0.2),
+                          offset: const Offset(0, 3),
+                          blurRadius: 3),
+                    ],
                     borderRadius: BorderRadius.all(
                         Radius.circular(widget.borderRadius ?? 0))),
                 child: AnimatedBuilder(
